@@ -1,4 +1,5 @@
 ## .NET js-parse (+firebase) ORM
+### NOT SAFE FOR PRODUCTION
 
 This is my try at building my own object-relational mapper (ORM) in .NET.
 
