@@ -11,7 +11,8 @@ Key features that I wanted to implement:
 * Caching
 * Intellisense + type checking
 * Key spelling checking
-* Typed queries
+
+Everything depends heavily on reflections and generics
 
 ```c#
 var chat = new DbChat()
@@ -33,10 +34,11 @@ In the first iteration I tried to build it towards the Firebase API but had a ha
 
 In the second iteration I used the Firebase .NET SDK, which has operations like .Increment("field", 2), so I added a bunch of reflection to solve object mapping and field assignment operations like =, ++, etc.
 
-In the third and last iteration I rebuilt everything for Parse JS since I switched to that backend. I built the ORM on top of the Parse .NET SDK but also added caching and handling of new field types such as DbObjectPointers, Relations, file pointers and object inheritance. I also wrapped all possible queries with a bunch of generics magic to provide type intellisense.
+In the third and last iteration I rebuilt everything for Parse JS since I switched to that backend. I built the ORM on top of the Parse .NET SDK but also added caching and handling of new field types such as DbObjectPointers, Relations, file pointers and object inheritance.
+
+
 
 ### DbObject example
-note, 
 ```c#
 public class DbMessage : DbObject
 {
@@ -84,5 +86,18 @@ public class DbMessage : DbObject
         // Deleted
     }
 }
+```
+
+### Query example
+Values are serialized properly, but unfortunatly, intellisense was not possible here.
+```c#
+public IPromise RemoveReactionAsync() =>
+    Database.GetQuery<DbReaction>()
+        .WhereEqualTo("problem", this)
+        .WhereEqualTo("type", ReactionTargetType)
+        .WhereEqualTo("user", Database.GetCurrentUser())
+        .FindAsync()
+        .Then(reactions =>
+            reactions.DeleteObjectsAsync()); // delete all reactions for this user, should only be one
 ```
 
